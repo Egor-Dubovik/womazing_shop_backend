@@ -4,6 +4,7 @@ import sequelize from "./db.js";
 import models from "./models/models.js";
 import cors from "cors"; // чтобы могли отправлять  запросы с браузера
 import router from "./routes/index.js";
+import errorHandler from "./middleware/ErrorHandlingMiddleware.js";
 
 dotenv.config();
 
@@ -13,6 +14,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use("/api", router);
+app.use(errorHandler); // ошибки обрабатываем всегда в конце
 
 const start = async () => {
   try {
