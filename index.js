@@ -5,6 +5,12 @@ import models from "./models/models.js";
 import cors from "cors"; // чтобы могли отправлять  запросы с браузера
 import router from "./routes/index.js";
 import errorHandler from "./middleware/ErrorHandlingMiddleware.js";
+import fileUpload from "express-fileupload";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 dotenv.config();
 
@@ -13,6 +19,8 @@ const PORT = process.env.PORT || 8000;
 const app = express();
 app.use(cors());
 app.use(express.json());
+app.use(express.static(path.resolve(__dirname, "static")));
+app.use(fileUpload({}));
 app.use("/api", router);
 app.use(errorHandler); // ошибки обрабатываем всегда в конце
 
