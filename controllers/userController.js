@@ -42,6 +42,26 @@ class UserController {
     const token = generateJwt(id, email, role);
     res.json({ token });
   }
+
+  async getAll(req, res) {
+    try {
+      const users = await models.User.findAndCountAll();
+      return res.json(users);
+    } catch (error) {
+      res.status(500).json(error.message);
+    }
+  }
+
+  async delete(req, res, next) {
+    try {
+      const { id } = req.params;
+      if (!id) return next(ApiError.badRequest("не указан id"));
+      const user = await models.User.destroy({ where: { id } });
+      return res.json(user);
+    } catch (error) {
+      res.status(500).json(error.message);
+    }
+  }
 }
 
 export default new UserController();
