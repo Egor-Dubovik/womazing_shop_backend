@@ -3,8 +3,8 @@ import models from "../models/models.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
-const generateJwt = (id, email, role) => {
-  return jwt.sign({ id, email, role }, process.env.SECRET_KEY, {
+const generateJwt = (id, basketId, email, role) => {
+  return jwt.sign({ id, basketId, email, role }, process.env.SECRET_KEY, {
     expiresIn: "24h",
   });
 };
@@ -20,7 +20,7 @@ class UserController {
     const hashPassword = await bcrypt.hash(password, 5);
     const user = await models.User.create({ email, password: hashPassword, role });
     const basket = await models.Basket.create({ userId: user.id });
-    const token = generateJwt(user.id, user.email, user.role);
+    const token = generateJwt(user.id, basket.id, user.email, user.role);
 
     return res.json({ token });
   }
@@ -33,13 +33,15 @@ class UserController {
     let comparePassword = bcrypt.compareSync(password, user.password);
     if (!comparePassword) return next(ApiError.internal("Указан не верный пароль"));
 
-    const token = generateJwt(user.id, user.email, user.role);
+    const basketInfo = await models.Basket.findOne({ where: { userId: user.id } });
+
+    const token = generateJwt(user.id, basketInfo.id, user.email, user.role);
     return res.json({ token });
   }
 
   async check(req, res, next) {
-    const { id, email, role } = req.user;
-    const token = generateJwt(id, email, role);
+    const { id, basketId, email, role } = req.user;
+    const token = generateJwt(id, basketId, email, role);
     res.json({ token });
   }
 
