@@ -10,32 +10,20 @@ const __dirname = path.dirname(__filename);
 class ProductController {
   async create(req, res, next) {
     try {
-      let {
-        name,
-        price,
-        discount_price,
-        size,
-        colors,
-        rating,
-        typeId,
-        brandId,
-        info,
-      } = req.body;
+      let { name, price, discount_price, typeId, brandId, info, size, color } = req.body;
       const { image } = req.files;
 
       let fileName = uuid.v4() + ".png";
       image.mv(path.resolve(__dirname, "..", "static", fileName));
 
       const needSize = JSON.parse(size);
-      const needColors = JSON.parse(colors);
 
       const product = await models.Product.create({
         name,
         price,
         discount_price,
         size: needSize,
-        colors: needColors,
-        rating,
+        // rating,
         typeId,
         brandId,
         image: fileName,
@@ -52,6 +40,17 @@ class ProductController {
         });
       }
 
+      if (color) {
+        color = JSON.parse(color);
+        color.forEach((colorItem) => {
+          models.ProductColor.create({
+            name: colorItem.name,
+            value: colorItem.value,
+            productId: product.id,
+          });
+        });
+      }
+
       return res.json(product);
     } catch (error) {
       next(ApiError.badRequest(error.message));
@@ -61,7 +60,7 @@ class ProductController {
   async getAll(req, res) {
     let { typeId, brandId, limit, page } = req.query;
     page = page || 1;
-    limit = limit || 9;
+    limit = limit || 50;
     let offset = page * limit - limit;
     let product;
 
@@ -100,7 +99,10 @@ class ProductController {
     const { id } = req.params;
     const product = await models.Product.findOne({
       where: { id },
-      include: [{ model: models.ProductInfo, as: "info" }],
+      include: [
+        { model: models.ProductInfo, as: "info" },
+        { model: models.ProductColor, as: "color" },
+      ],
     });
     return res.json(product);
   }

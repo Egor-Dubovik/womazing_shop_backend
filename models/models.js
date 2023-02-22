@@ -23,20 +23,13 @@ const Product = sequelize.define("product", {
   id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
   name: { type: DataTypes.STRING, unique: true, allowNull: false },
   price: { type: DataTypes.INTEGER, allowNull: false },
-  discount_price: { type: DataTypes.INTEGER, allowNull: false },
-  size: { type: DataTypes.ARRAY(DataTypes.CHAR), allowNull: false },
-  colors: { type: DataTypes.ARRAY(DataTypes.STRING), allowNull: false },
-  rating: { type: DataTypes.INTEGER, defaultValue: 0 },
+  discount_price: { type: DataTypes.INTEGER, defaultValue: 0 },
+  size: { type: DataTypes.ARRAY(DataTypes.STRING), allowNull: false },
+  // colors: { type: DataTypes.ARRAY(DataTypes.STRING), allowNull: false },
   image: { type: DataTypes.STRING, allowNull: false },
 });
 
-// user_id and product_id
-const ProductInfo = sequelize.define("product_info", {
-  id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-  title: { type: DataTypes.STRING, allowNull: false },
-  description: { type: DataTypes.STRING, allowNull: false },
-});
-
+//todo Rating
 const Rating = sequelize.define("rating", {
   id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
   rate: { type: DataTypes.INTEGER, allowNull: false },
@@ -55,6 +48,22 @@ const Brand = sequelize.define("brand", {
 const TypeBrand = sequelize.define("type_brand", {
   id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
 });
+
+// user_id and product_id
+const ProductInfo = sequelize.define("product_info", {
+  id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+  title: { type: DataTypes.STRING, allowNull: false },
+  description: { type: DataTypes.STRING, allowNull: false },
+});
+
+const ProductColor = sequelize.define("product_color", {
+  id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+  name: { type: DataTypes.STRING, allowNull: false },
+  value: { type: DataTypes.STRING, allowNull: false },
+});
+
+Product.hasMany(ProductColor, { as: "color" });
+ProductColor.belongsTo(Product);
 
 User.hasOne(Basket);
 Basket.belongsTo(User);
@@ -96,6 +105,7 @@ const models = {
   Type,
   Brand,
   TypeBrand,
+  ProductColor,
 };
 
 export default models;

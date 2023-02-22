@@ -27,7 +27,7 @@ app.use(errorHandler); // ошибки обрабатываем всегда в 
 const start = async () => {
   try {
     await sequelize.authenticate(); //устанавливается подключение к базе данных
-    await sequelize.sync(); //сверяет состояние базы данных с нашей схемой данных
+    await sequelize.sync({ alter: true }); //сверяет состояние базы данных с нашей схемой данных
     app.listen(PORT, () => console.log(`server started in port: ${PORT}`));
   } catch (error) {
     console.log(error);
